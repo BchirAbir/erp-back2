@@ -1,0 +1,117 @@
+[dotenv@17.3.1] injecting env (7) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[PayrollCron] Scheduled — checks every 12h for end-of-month payroll
+[12:47:41.520] [32mINFO[39m (13364): [36m✅ MongoDB Connected: 127.0.0.1[39m
+[12:47:42.392] [32mINFO[39m (13364): [36mServer listening at http://127.0.0.1:5000[39m
+[12:47:42.392] [32mINFO[39m (13364): [36mServer listening at http://192.168.1.109:5000[39m
+[12:47:44.455] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-1"
+    [35mreq[39m: {
+      "method": "GET",
+      "url": "/api/gmao/health",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 53746
+    }
+[12:47:44.463] [32mINFO[39m (13364): [36mOK GET /api/gmao/health - 7.1ms[39m
+[12:47:44.463] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-1"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 7.112900018692017
+[12:48:03.804] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-2"
+    [35mreq[39m: {
+      "method": "GET",
+      "url": "/api/gmao/health",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 53636
+    }
+[12:48:03.806] [32mINFO[39m (13364): [36mOK GET /api/gmao/health - 1.7ms[39m
+[12:48:03.806] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-2"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 1.7430999279022217
+[12:48:20.203] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-3"
+    [35mreq[39m: {
+      "method": "POST",
+      "url": "/api/auth/login",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 60418
+    }
+[12:48:20.336] [32mINFO[39m (13364): [36mOK POST /api/auth/login - 131.7ms[39m
+[12:48:20.336] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-3"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 131.7230999469757
+[12:48:20.347] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-4"
+    [35mreq[39m: {
+      "method": "GET",
+      "url": "/api/gmao/auth/me",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 60418
+    }
+[12:48:20.398] [32mINFO[39m (13364): [36mOK GET /api/gmao/auth/me - 50.5ms[39m
+[12:48:20.399] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-4"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 50.54259991645813
+[12:48:20.402] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-5"
+    [35mreq[39m: {
+      "method": "GET",
+      "url": "/api/gmao/kpi/dashboard",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 60418
+    }
+[12:48:20.562] [32mINFO[39m (13364): [36mOK GET /api/gmao/kpi/dashboard - 159.8ms[39m
+[12:48:20.562] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-5"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 159.82589995861053
+[12:54:09.566] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-6"
+    [35mreq[39m: {
+      "method": "POST",
+      "url": "/api/auth/login",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 61006
+    }
+[12:54:09.640] [32mINFO[39m (13364): [36mOK POST /api/auth/login - 74.2ms[39m
+[12:54:09.640] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-6"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 74.18529999256134
+[12:54:09.668] [32mINFO[39m (13364): [36mincoming request[39m
+    [35mreqId[39m: "req-7"
+    [35mreq[39m: {
+      "method": "GET",
+      "url": "/api/gmao/auth/me",
+      "host": "localhost:5000",
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 61006
+    }
+[12:54:09.683] [32mINFO[39m (13364): [36mOK GET /api/gmao/auth/me - 14.9ms[39m
+[12:54:09.683] [32mINFO[39m (13364): [36mrequest completed[39m
+    [35mreqId[39m: "req-7"
+    [35mres[39m: {
+      "statusCode": 200
+    }
+    [35mresponseTime[39m: 14.853899955749512
