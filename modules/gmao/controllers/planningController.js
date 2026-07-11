@@ -4,11 +4,11 @@ const User                  = require('../models/User')
 const { success, error, paginated } = require('../utils/apiResponse')
 const logger = require('../utils/logger')
 
-// GET /api/planning/semaine  â€“ planning hebdomadaire de tous les techniciens
+// GET /api/planning/semaine  - planning hebdomadaire de tous les techniciens
 exports.getSemaine = async (req, res, next) => {
   try {
-    // Calcul dÃ©but/fin de semaine demandÃ©e (dÃ©faut: semaine courante)
-    const offset = Number(req.query.offset || 0) // 0=cette semaine, -1=prÃ©c, 1=suiv
+    // Calcul début/fin de semaine demandée (défaut: semaine courante)
+    const offset = Number(req.query.offset || 0) // 0=cette semaine, -1=préc, 1=suiv
     const lundi  = new Date()
     const day = lundi.getDay()
     const diffToMonday = (day + 6) % 7
@@ -64,7 +64,7 @@ exports.getSemaine = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/planning/preventif  â€“ plans de maintenance prÃ©ventive
+// GET /api/planning/preventif  - plans de maintenance préventive
 exports.getPlansPreventifs = async (req, res, next) => {
   try {
     const { page=1, limit=20, equipement } = req.query
@@ -79,7 +79,7 @@ exports.getPlansPreventifs = async (req, res, next) => {
       .skip((page - 1) * limit)
       .limit(Number(limit))
 
-    return paginated(res, plans, total, page, limit, 'Plans rÃ©cupÃ©rÃ©s')
+    return paginated(res, plans, total, page, limit, 'Plans récupérés')
   } catch (err) { next(err) }
 }
 
@@ -95,12 +95,12 @@ exports.getPlanById = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// POST /api/planning/preventif  â€“ crÃ©er un plan prÃ©ventif
+// POST /api/planning/preventif  - créer un plan préventif
 exports.creerPlan = async (req, res, next) => {
   try {
     const plan = await MaintenancePreventive.create(req.body)
-    logger.info(`Plan prÃ©ventif crÃ©Ã© : ${plan.idPlan} â€“ Ã©quipement: ${plan.equipement}`)
-    return success(res, { plan }, 'Plan de maintenance crÃ©Ã©', 201)
+    logger.info(`Plan préventif créé : ${plan.idPlan} - équipement: ${plan.equipement}`)
+    return success(res, { plan }, 'Plan de maintenance créé', 201)
   } catch (err) { next(err) }
 }
 
@@ -110,11 +110,11 @@ exports.updatePlan = async (req, res, next) => {
     const plan = await MaintenancePreventive.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
       .populate('equipement', 'nom idEquipement')
     if (!plan) return error(res, 'Plan introuvable', 404)
-    return success(res, { plan }, 'Plan mis Ã  jour')
+    return success(res, { plan }, 'Plan mis à jour')
   } catch (err) { next(err) }
 }
 
-// POST /api/planning/preventif/:id/generer-ot  â€“ genererOT() du diagramme MaintenancePreventive
+// POST /api/planning/preventif/:id/generer-ot  - genererOT() du diagramme MaintenancePreventive
 exports.genererOT = async (req, res, next) => {
   try {
     const plan = await MaintenancePreventive.findById(req.params.id).populate('equipement')
@@ -125,22 +125,22 @@ exports.genererOT = async (req, res, next) => {
       priorite:      'normal',
       statut:        'planned',
       equipement:    plan.equipement._id,
-      titre:         `Maintenance prÃ©ventive â€“ ${plan.equipement.nom}`,
-      description:   plan.description || `ExÃ©cution plan ${plan.idPlan} : ${plan.nom}`,
+      titre:         `Maintenance préventive - ${plan.equipement.nom}`,
+      description:   plan.description || `Exécution plan ${plan.idPlan} : ${plan.nom}`,
       datePlanifiee: plan.dateProchaine,
       tempsEstime:   plan.dureeEstimeeMin,
       creePar:       req.user._id,
     })
 
-    // Mettre Ã  jour le plan
+    // Mettre à jour le plan
     plan.otGeneres.push(ot._id)
     plan.derniereMaintenance = new Date()
     plan.dateProchaine = new Date(Date.now() + plan.frequenceJours * 24 * 3600 * 1000)
     plan.compliancePct = 100
     await plan.save()
 
-    logger.info(`OT prÃ©ventif gÃ©nÃ©rÃ© : ${ot.idOT} depuis plan ${plan.idPlan}`)
-    return success(res, { ot, plan }, `OT ${ot.idOT} gÃ©nÃ©rÃ©`, 201)
+    logger.info(`OT préventif généré : ${ot.idOT} depuis plan ${plan.idPlan}`)
+    return success(res, { ot, plan }, `OT ${ot.idOT} généré`, 201)
   } catch (err) { next(err) }
 }
 
@@ -148,7 +148,7 @@ exports.genererOT = async (req, res, next) => {
 exports.deletePlan = async (req, res, next) => {
   try {
     await MaintenancePreventive.findByIdAndUpdate(req.params.id, { actif: false })
-    return success(res, {}, 'Plan dÃ©sactivÃ©')
+    return success(res, {}, 'Plan désactivé')
   } catch (err) { next(err) }
 }
 

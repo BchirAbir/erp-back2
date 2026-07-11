@@ -4,6 +4,28 @@ const { success, error, paginated } = require('../utils/apiResponse')
 const logger = require('../utils/logger')
 const { nextCode } = require('../utils/idSequence')
 
+async function notifyAdminPieceStockDecrease({ req, piece, quantiteRetiree, ancienStock, nouveauStock, action }) {
+  await Notification.create({
+    type: 'piece_stock_diminue',
+    titre: 'Quantite piece detachee diminuee',
+    message: `${req.user?.prenom || 'Utilisateur'} ${req.user?.nom || ''} a diminue le stock de ${piece.nomPiece} de ${quantiteRetiree} ${piece.unite || 'unite'}.`,
+    cibleRole: 'admin',
+    creePar: req.user?._id,
+    donnees: {
+      action,
+      piece: piece._id,
+      idPiece: piece.idPiece,
+      reference: piece.reference,
+      nomPiece: piece.nomPiece,
+      quantiteRetiree,
+      ancienStock,
+      nouveauStock,
+      unite: piece.unite,
+      seuilAlerte: piece.seuilAlerte,
+      seuilCritique: piece.seuilCritique,
+    },
+  })
+}
 function populatePiece(query) {
   return query
     .populate('equipementsCompatibles', 'nom idEquipement localisation')
@@ -71,8 +93,20 @@ exports.update = async (req, res, next) => {
     const piece = await PieceDetachee.findById(req.params.id)
     if (!piece) return error(res, 'Pièce introuvable', 404)
 
+    const ancienStock = piece.quantiteStock
     Object.assign(piece, req.body)
     await piece.save()
+
+    if (req.body.quantiteStock !== undefined && piece.quantiteStock < ancienStock) {
+      await notifyAdminPieceStockDecrease({
+        req,
+        piece,
+        quantiteRetiree: ancienStock - piece.quantiteStock,
+        ancienStock,
+        nouveauStock: piece.quantiteStock,
+        action: 'modification_stock',
+      })
+    }
 
     const populated = await populatePiece(PieceDetachee.findById(piece._id)).lean()
     return success(res, { piece: populated }, 'Pièce mise à jour')
@@ -98,6 +132,7 @@ exports.consommer = async (req, res, next) => {
     if (!piece) return error(res, 'Piece introuvable', 404)
     if (piece.quantiteStock < quantite) return error(res, 'Stock insuffisant', 400)
 
+    const ancienStock = piece.quantiteStock
     piece.quantiteStock -= quantite
     piece.historique.push({
       type: 'consommation',
@@ -106,6 +141,15 @@ exports.consommer = async (req, res, next) => {
       observation: req.body.observation || '',
     })
     await piece.save()
+
+    await notifyAdminPieceStockDecrease({
+      req,
+      piece,
+      quantiteRetiree: quantite,
+      ancienStock,
+      nouveauStock: piece.quantiteStock,
+      action: 'consommation',
+    })
 
     const populated = await populatePiece(PieceDetachee.findById(piece._id)).lean()
     logger.info(`Consommation piece ${piece.reference} : -${quantite}`)

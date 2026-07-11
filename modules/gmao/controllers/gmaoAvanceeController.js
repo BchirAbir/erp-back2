@@ -5,7 +5,7 @@ const Equipement = require('../models/Equipement');
 const { success, error } = require('../utils/apiResponse');
 
 /**
- * RÃ©cupÃ¨re les donnÃ©es globales du tableau de bord GMAO Expert
+ * Récupère les données globales du tableau de bord GMAO Expert
  */
 exports.getDashboard = async (req, res, next) => {
   try {
@@ -143,13 +143,13 @@ async function buildFmeaPayload(body, userId) {
 }
 
 /**
- * CrÃ©e un nouveau contrÃ´le ou suivi de conformitÃ© rÃ©glementaire
+ * Crée un nouveau contrôle ou suivi de conformité réglementaire
  */
 exports.createConformite = async (req, res, next) => {
   try {
     const { equipement, typeControle, dateEcheance, statut, dateDerniere } = req.body;
     if (!equipement || !typeControle || !dateEcheance) {
-      return error(res, 'Ã‰quipement, type de contrÃ´le et date d\'Ã©chÃ©ance requis', 400);
+      return error(res, 'Équipement, type de contrôle et date d\'échéance requis', 400);
     }
 
     const statutMap = {
@@ -171,7 +171,7 @@ exports.createConformite = async (req, res, next) => {
     const item = await ConformiteReglementaire.create(payload);
     const populated = await ConformiteReglementaire.findById(item._id).populate('equipement', 'nom idEquipement localisation');
     
-    return success(res, { conformite: populated }, 'ContrÃ´le rÃ©glementaire crÃ©Ã©', 201);
+    return success(res, { conformite: populated }, 'Contrôle réglementaire créé', 201);
   } catch (err) { 
     next(err); 
   }

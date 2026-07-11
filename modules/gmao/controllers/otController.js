@@ -30,6 +30,31 @@ async function notifierTechnicienAffecte(ot, creePar) {
   })
 }
 
+async function notifierAdminPieceDiminuee({ req, piece, quantiteRetiree, ancienStock, nouveauStock, ot }) {
+  await Notification.create({
+    type: 'piece_stock_diminue',
+    titre: 'Quantite piece detachee diminuee',
+    message: `${req.user?.prenom || 'Utilisateur'} ${req.user?.nom || ''} a diminue le stock de ${piece.nomPiece} de ${quantiteRetiree} ${piece.unite || 'unite'}.`,
+    cibleRole: 'admin',
+    creePar: req.user?._id,
+    donnees: {
+      action: 'consommation_ot',
+      piece: piece._id,
+      idPiece: piece.idPiece,
+      reference: piece.reference,
+      nomPiece: piece.nomPiece,
+      quantiteRetiree,
+      ancienStock,
+      nouveauStock,
+      unite: piece.unite,
+      seuilAlerte: piece.seuilAlerte,
+      seuilCritique: piece.seuilCritique,
+      otId: ot?._id,
+      idOT: ot?.idOT,
+      titreOT: ot?.titre,
+    },
+  })
+}
 // GET /api/ordres-travail (Avec filtres et pagination optimisés)
 exports.getAll = async (req, res, next) => {
   try {
@@ -271,8 +296,17 @@ exports.consommerPiece = async (req, res, next) => {
       return error(res, `Stock insuffisant (${piece.quantiteStock} unités disponibles)`, 400)
     }
 
-    // Décrémenter le stock via la méthode du modèle
+    // Decrementer le stock via la methode du modele
+    const ancienStock = piece.quantiteStock
     await piece.consommer(quantite, ot._id, req.user._id)
+    await notifierAdminPieceDiminuee({
+      req,
+      piece,
+      quantiteRetiree: quantite,
+      ancienStock,
+      nouveauStock: piece.quantiteStock,
+      ot,
+    })
 
     // Enregistrement de la ligne de consommation et mise à jour du coût global de l'OT
     ot.piecesConsommees.push({ piece: pieceId, quantite })

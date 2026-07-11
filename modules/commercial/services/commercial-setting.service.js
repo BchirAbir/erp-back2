@@ -1,4 +1,4 @@
-git remote add origin https://github.com/BchirAbir/erp-back2.gitconst CommercialSetting = require("../models/commercial-setting.model");
+const CommercialSetting = require("../models/commercial-setting.model");
 
 const getSingleton = async () => {
   let doc = await CommercialSetting.findOne();

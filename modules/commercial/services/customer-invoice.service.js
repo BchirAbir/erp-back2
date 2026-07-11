@@ -1,4 +1,3 @@
-git push -u origin main
 const CustomerInvoice = require("../models/customer-invoice.model");
 const financeService = require("../../finance/services/finance.service");
 const purchaseSettingService = require("../../purchase/services/purchase-setting.service");

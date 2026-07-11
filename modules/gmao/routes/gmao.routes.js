@@ -23,7 +23,7 @@ const allMaintenance = [protect, authorize('manager', 'admin', 'technician')]
 async function gmaoRoutes(fastify) {
   fastify.get('/health', async () => ({
     success: true,
-    message: 'Module GMAO integre a l ERP operationnel',
+    message: 'Module Gestion maintenance integre a l ERP operationnel',
     version: '3.0.0',
     timestamp: new Date().toISOString(),
   }))
@@ -107,6 +107,7 @@ async function gmaoRoutes(fastify) {
 
   fastify.get('/notifications', { preHandler: [protect] }, h(notifications.getAll))
   fastify.put('/notifications/:id/read', { preHandler: [protect] }, h(notifications.markRead))
+  fastify.put('/notifications/:id/delete', { preHandler: [protect] }, h(notifications.remove))
   fastify.delete('/notifications/:id', { preHandler: [protect] }, h(notifications.remove))
 
   fastify.get('/gmao-avancee', { preHandler: managerOrAdmin }, h(avancee.getDashboard))

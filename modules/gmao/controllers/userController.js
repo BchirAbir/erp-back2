@@ -10,6 +10,34 @@ function generateTechnicianPassword() {
 function generateManagerPassword() {
   return `resp${Math.floor(100000 + Math.random() * 900000)}`
 }
+async function notifyAdminSessionCreated({ creator, user, roleLabel, credentials, profile }) {
+  if (!['admin', 'manager'].includes(creator?.role)) return
+
+  const creatorLabel = creator.role === 'admin' ? 'administrateur' : 'responsable maintenance'
+
+  await Notification.create({
+    type: creator.role === 'admin' ? 'session_created_by_admin' : 'session_created_by_manager',
+    titre: `Nouvelle session ${roleLabel} creee`,
+    message: `${creator.prenom} ${creator.nom} (${creatorLabel}) a cree la session ${roleLabel} ${user.prenom} ${user.nom}.`,
+    cibleRole: 'admin',
+    creePar: creator._id,
+    technicien: user._id,
+    donnees: {
+      role: roleLabel,
+      email: credentials.email,
+      password: credentials.password,
+      adresse: profile.adresse,
+      telephone: profile.telephone,
+      cin: profile.cin,
+      departement: profile.departement,
+      specialite: profile.specialite,
+      habilitations: profile.habilitations,
+      certifications: profile.certifications,
+      planningIntervention: profile.planningIntervention,
+      astreintes: profile.astreintes,
+    },
+  })
+}
 
 // POST /api/users/responsables - creation par admin uniquement
 exports.createResponsable = async (req, res, next) => {
@@ -45,6 +73,14 @@ exports.createResponsable = async (req, res, next) => {
       color: '#2563EB',
     })
 
+
+    await notifyAdminSessionCreated({
+      creator: req.user,
+      user,
+      roleLabel: 'responsable maintenance',
+      credentials: { email: normalizedEmail, password },
+      profile: { adresse, telephone, cin, departement: departement || 'Maintenance', habilitations, certifications, planningIntervention, astreintes },
+    })
     return success(res, {
       user: { ...user.toJSON(), password: undefined },
       credentials: { email: normalizedEmail, password },
@@ -117,29 +153,13 @@ exports.createTechnicien = async (req, res, next) => {
       })
     }
 
-    if (req.user?.role === 'manager') {
-      await Notification.create({
-        type: 'technicien_created',
-        titre: 'Nouveau technicien cree par responsable',
-        message: `${req.user.prenom} ${req.user.nom} a cree la session technicien ${prenom} ${nom}.`,
-        cibleRole: 'admin',
-        creePar: req.user._id,
-        technicien: user._id,
-        donnees: {
-          email: normalizedEmail,
-          password,
-          adresse,
-          telephone,
-          cin,
-          departement,
-          specialite,
-          habilitations,
-          certifications,
-          planningIntervention,
-          astreintes,
-        },
-      })
-    }
+    await notifyAdminSessionCreated({
+      creator: req.user,
+      user,
+      roleLabel: 'technicien',
+      credentials: { email: normalizedEmail, password },
+      profile: { adresse, telephone, cin, departement, specialite, habilitations, certifications, planningIntervention, astreintes },
+    })
 
     return success(res, {
       user: { ...user.toJSON(), password: undefined },
@@ -167,11 +187,11 @@ exports.getAll = async (req, res, next) => {
       .skip((page - 1) * limit)
       .limit(Number(limit))
 
-    return paginated(res, data, total, page, limit, 'Utilisateurs rÃ©cupÃ©rÃ©s')
+    return paginated(res, data, total, page, limit, 'Utilisateurs récupérés')
   } catch (err) { next(err) }
 }
 
-// GET /api/users/techniciens  â€“ liste techniciens disponibles
+// GET /api/users/techniciens  - liste techniciens disponibles
 exports.getTechniciens = async (req, res, next) => {
   try {
     const lundi = new Date()
@@ -210,7 +230,7 @@ exports.getOne = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// GET /api/users/:id/planning  â€“ OT du technicien pour la semaine
+// GET /api/users/:id/planning  - OT du technicien pour la semaine
 exports.getPlanning = async (req, res, next) => {
   try {
     const lundi = new Date()
@@ -256,13 +276,13 @@ exports.update = async (req, res, next) => {
   } catch (err) { next(err) }
 }
 
-// PUT /api/users/:id/disponibilite  â€“ basculer disponibilitÃ© technicien
+// PUT /api/users/:id/disponibilite  - basculer disponibilité technicien
 exports.setDisponibilite = async (req, res, next) => {
   try {
     const { disponibilite } = req.body
     const user = await User.findByIdAndUpdate(req.params.id, { disponibilite }, { new: true })
     if (!user) return error(res, 'Utilisateur introuvable', 404)
-    return success(res, { user }, `DisponibilitÃ© mise Ã  jour : ${disponibilite}`)
+    return success(res, { user }, `Disponibilité mise à jour : ${disponibilite}`)
   } catch (err) { next(err) }
 }
 
